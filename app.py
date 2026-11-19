@@ -17,32 +17,32 @@ st.set_page_config(
 DB_NAME = "barangay_health.db"
 
 # ==========================================
-# CUSTOM HEALTHCARE COLOR THEME (CSS)
+# HOSPITAL RED & CLINICAL WHITE THEME (CSS)
 # ==========================================
 st.markdown("""
 <style>
     /* Main App Background & Headers */
     .stApp {
-        background-color: #F4F9F9;
+        background-color: #FFF8F8;
     }
     h1, h2, h3 {
-        color: #0F4C5C !important;
+        color: #990011 !important;
     }
 
-    /* Sidebar Styling */
+    /* Sidebar Styling - Deep Hospital Crimson */
     [data-testid="stSidebar"] {
-        background-color: #0F4C5C;
+        background: linear-gradient(180deg, #990011 0%, #7A000E 100%);
     }
     [data-testid="stSidebar"] * {
         color: #FFFFFF !important;
     }
     [data-testid="stSidebar"] hr {
-        border-color: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.25);
     }
 
-    /* Primary Buttons */
+    /* Primary Buttons - Hospital Red */
     .stButton > button, .stFormSubmitButton > button {
-        background-color: #008080 !important;
+        background-color: #C8102E !important;
         color: #FFFFFF !important;
         border: none !important;
         border-radius: 8px !important;
@@ -50,54 +50,65 @@ st.markdown("""
         transition: 0.2s ease-in-out;
     }
     .stButton > button:hover, .stFormSubmitButton > button:hover {
-        background-color: #006666 !important;
-        box-shadow: 0 4px 10px rgba(0, 128, 128, 0.25);
+        background-color: #990011 !important;
+        box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
     }
 
-    /* Custom Colored KPI Metric Cards */
+    /* Form Containers - Crisp White Card with Red Top Accent */
+    [data-testid="stForm"] {
+        background-color: #FFFFFF;
+        padding: 20px;
+        border-radius: 12px;
+        border-top: 4px solid #C8102E;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Custom Colored Hospital KPI Metric Cards */
     .kpi-card {
         padding: 18px 20px;
         border-radius: 12px;
         color: #FFFFFF;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         margin-bottom: 10px;
     }
     .kpi-title {
-        font-size: 0.9rem;
-        font-weight: 600;
-        opacity: 0.9;
+        font-size: 0.88rem;
+        font-weight: 700;
+        opacity: 0.92;
         margin-bottom: 6px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.6px;
     }
     .kpi-value {
-        font-size: 2.1rem;
+        font-size: 2.2rem;
         font-weight: 800;
         line-height: 1.1;
     }
-    .kpi-teal { background: linear-gradient(135deg, #0F4C5C, #1B7A8C); }
-    .kpi-green { background: linear-gradient(135deg, #1E8449, #2ECC71); }
-    .kpi-amber { background: linear-gradient(135deg, #D68910, #F39C12); }
-    .kpi-red { background: linear-gradient(135deg, #B03A2E, #E74C3C); }
+    .kpi-crimson { background: linear-gradient(135deg, #C8102E, #E63946); }
+    .kpi-navy    { background: linear-gradient(135deg, #1D3557, #457B9D); }
+    .kpi-emerald { background: linear-gradient(135deg, #1B7F5C, #2A9D8F); }
+    .kpi-amber   { background: linear-gradient(135deg, #D97706, #F59E0B); }
 
     /* Login Banner Card */
     .login-banner {
-        background: linear-gradient(135deg, #0F4C5C, #008080);
-        padding: 25px 30px;
+        background: linear-gradient(135deg, #990011, #C8102E);
+        padding: 28px 32px;
         border-radius: 14px;
         color: white;
         margin-bottom: 24px;
-        box-shadow: 0 6px 16px rgba(15, 76, 92, 0.2);
+        box-shadow: 0 6px 18px rgba(153, 0, 17, 0.25);
+        border-left: 8px solid #FFFFFF;
     }
     .login-banner h1 {
         color: #FFFFFF !important;
         margin: 0;
-        font-size: 1.8rem;
+        font-size: 1.85rem;
     }
     .login-banner p {
-        color: #E0F2F1;
+        color: #FFE5E8;
         margin-top: 6px;
         margin-bottom: 0;
+        font-size: 1rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -258,18 +269,18 @@ if "logged_in" not in st.session_state:
 if not st.session_state.logged_in:
     st.markdown("""
         <div class="login-banner">
-            <h1>🏥 Barangay Senior Citizen Health Checkup Records Monitoring System</h1>
-            <p>Authorized Barangay Health Center Portal — Senior Citizen Care & Follow-Up Tracking</p>
+            <h1>✚ Barangay Senior Citizen Health Checkup Records Monitoring System</h1>
+            <p>Barangay Health Center Medical Records & Follow-Up Monitoring Portal</p>
         </div>
     """, unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 1.4])
     with col1:
         with st.form("login_form"):
-            st.subheader("Staff Login")
+            st.subheader("Authorized Personnel Login")
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
-            submit = st.form_submit_button("Login", use_container_width=True)
+            submit = st.form_submit_button("Sign In", use_container_width=True)
             
             if submit:
                 user = login_user(username, password)
@@ -297,8 +308,8 @@ if not st.session_state.logged_in:
 # SIDEBAR NAVIGATION
 # ==========================================
 user = st.session_state.user
-st.sidebar.title("🏥 Health Center Portal")
-st.sidebar.markdown(f"**User:** {user['full_name']}")
+st.sidebar.title("✚ Health Center Portal")
+st.sidebar.markdown(f"**Staff:** {user['full_name']}")
 st.sidebar.markdown(f"**Role:** {user['role']}")
 st.sidebar.divider()
 
@@ -336,18 +347,18 @@ if choice == "📊 Dashboard":
     upcoming_count = len(schedules_df[(schedules_df["status"] == "Scheduled") & (schedules_df["scheduled_date"] >= today_str)])
     overdue_count = len(schedules_df[(schedules_df["status"] == "Scheduled") & (schedules_df["scheduled_date"] < today_str)])
     
-    # Colored KPI Cards
+    # Hospital Color-Coded KPI Cards
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(f"""
-            <div class="kpi-card kpi-teal">
+            <div class="kpi-card kpi-navy">
                 <div class="kpi-title">Registered Seniors</div>
                 <div class="kpi-value">{len(seniors_df)}</div>
             </div>
         """, unsafe_allow_html=True)
     with c2:
         st.markdown(f"""
-            <div class="kpi-card kpi-green">
+            <div class="kpi-card kpi-emerald">
                 <div class="kpi-title">Completed Checkups</div>
                 <div class="kpi-value">{len(checkups_df)}</div>
             </div>
@@ -361,7 +372,7 @@ if choice == "📊 Dashboard":
         """, unsafe_allow_html=True)
     with c4:
         st.markdown(f"""
-            <div class="kpi-card kpi-red">
+            <div class="kpi-card kpi-crimson">
                 <div class="kpi-title">Overdue Follow-Ups</div>
                 <div class="kpi-value">{overdue_count}</div>
             </div>
@@ -392,7 +403,7 @@ if choice == "📊 Dashboard":
                 values="Count",
                 names="Service",
                 hole=0.45,
-                color_discrete_sequence=["#0F4C5C", "#008080", "#2ECC71", "#F39C12", "#3498DB"]
+                color_discrete_sequence=["#C8102E", "#1D3557", "#2A9D8F", "#F59E0B", "#E63946"]
             )
             fig.update_layout(
                 margin=dict(t=20, b=20, l=20, r=20),
@@ -575,7 +586,7 @@ elif choice == "📅 Follow-Up Monitoring":
     
     def get_display_status(row):
         if row["status"] == "Scheduled" and row["scheduled_date"] < today_str:
-            return "⚠️ Overdue"
+            return "🚨 Overdue"
         elif row["status"] == "Scheduled":
             return "🗓️ Upcoming"
         elif row["status"] == "Completed":
@@ -584,11 +595,11 @@ elif choice == "📅 Follow-Up Monitoring":
 
     def color_status_row(val):
         if "Overdue" in str(val):
-            return "background-color: #FADBD8; color: #922B21; font-weight: bold;"
+            return "background-color: #FADBD8; color: #990011; font-weight: bold;"
         elif "Upcoming" in str(val):
-            return "background-color: #FCF3CF; color: #9A7D0A; font-weight: bold;"
+            return "background-color: #FEF5E7; color: #B9770E; font-weight: bold;"
         elif "Completed" in str(val):
-            return "background-color: #D4EFDF; color: #1E8449; font-weight: bold;"
+            return "background-color: #D4EFDF; color: #1B7F5C; font-weight: bold;"
         elif "Missed" in str(val):
             return "background-color: #EBEDEF; color: #566573; font-weight: bold;"
         return ""
@@ -596,7 +607,7 @@ elif choice == "📅 Follow-Up Monitoring":
     if not df_sched.empty:
         df_sched["Monitoring Status"] = df_sched.apply(get_display_status, axis=1)
         
-        filter_status = st.selectbox("Filter Visits", ["All", "⚠️ Overdue", "🗓️ Upcoming", "✅ Completed", "❌ Missed"])
+        filter_status = st.selectbox("Filter Visits", ["All", "🚨 Overdue", "🗓️ Upcoming", "✅ Completed", "❌ Missed"])
         if filter_status != "All":
             filtered_df = df_sched[df_sched["Monitoring Status"] == filter_status]
         else:
