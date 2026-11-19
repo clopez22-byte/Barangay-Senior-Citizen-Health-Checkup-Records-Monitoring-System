@@ -17,6 +17,92 @@ st.set_page_config(
 DB_NAME = "barangay_health.db"
 
 # ==========================================
+# CUSTOM HEALTHCARE COLOR THEME (CSS)
+# ==========================================
+st.markdown("""
+<style>
+    /* Main App Background & Headers */
+    .stApp {
+        background-color: #F4F9F9;
+    }
+    h1, h2, h3 {
+        color: #0F4C5C !important;
+    }
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: #0F4C5C;
+    }
+    [data-testid="stSidebar"] * {
+        color: #FFFFFF !important;
+    }
+    [data-testid="stSidebar"] hr {
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Primary Buttons */
+    .stButton > button, .stFormSubmitButton > button {
+        background-color: #008080 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        transition: 0.2s ease-in-out;
+    }
+    .stButton > button:hover, .stFormSubmitButton > button:hover {
+        background-color: #006666 !important;
+        box-shadow: 0 4px 10px rgba(0, 128, 128, 0.25);
+    }
+
+    /* Custom Colored KPI Metric Cards */
+    .kpi-card {
+        padding: 18px 20px;
+        border-radius: 12px;
+        color: #FFFFFF;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 10px;
+    }
+    .kpi-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        opacity: 0.9;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .kpi-value {
+        font-size: 2.1rem;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+    .kpi-teal { background: linear-gradient(135deg, #0F4C5C, #1B7A8C); }
+    .kpi-green { background: linear-gradient(135deg, #1E8449, #2ECC71); }
+    .kpi-amber { background: linear-gradient(135deg, #D68910, #F39C12); }
+    .kpi-red { background: linear-gradient(135deg, #B03A2E, #E74C3C); }
+
+    /* Login Banner Card */
+    .login-banner {
+        background: linear-gradient(135deg, #0F4C5C, #008080);
+        padding: 25px 30px;
+        border-radius: 14px;
+        color: white;
+        margin-bottom: 24px;
+        box-shadow: 0 6px 16px rgba(15, 76, 92, 0.2);
+    }
+    .login-banner h1 {
+        color: #FFFFFF !important;
+        margin: 0;
+        font-size: 1.8rem;
+    }
+    .login-banner p {
+        color: #E0F2F1;
+        margin-top: 6px;
+        margin-bottom: 0;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ==========================================
 # DATABASE & AUTHENTICATION FUNCTIONS
 # ==========================================
 def get_connection():
@@ -170,12 +256,17 @@ if "logged_in" not in st.session_state:
     st.session_state.user = None
 
 if not st.session_state.logged_in:
-    st.title("🏥 Barangay Senior Citizen Health Checkup Records Monitoring System")
-    st.markdown("Please log in using your authorized Barangay Health Center credentials.")
+    st.markdown("""
+        <div class="login-banner">
+            <h1>🏥 Barangay Senior Citizen Health Checkup Records Monitoring System</h1>
+            <p>Authorized Barangay Health Center Portal — Senior Citizen Care & Follow-Up Tracking</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns([1, 1.5])
+    col1, col2 = st.columns([1, 1.4])
     with col1:
         with st.form("login_form"):
+            st.subheader("Staff Login")
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
             submit = st.form_submit_button("Login", use_container_width=True)
@@ -208,7 +299,7 @@ if not st.session_state.logged_in:
 user = st.session_state.user
 st.sidebar.title("🏥 Health Center Portal")
 st.sidebar.markdown(f"**User:** {user['full_name']}")
-st.sidebar.markdown(f"**Role:** `{user['role']}`")
+st.sidebar.markdown(f"**Role:** {user['role']}")
 st.sidebar.divider()
 
 menu_options = [
@@ -245,11 +336,36 @@ if choice == "📊 Dashboard":
     upcoming_count = len(schedules_df[(schedules_df["status"] == "Scheduled") & (schedules_df["scheduled_date"] >= today_str)])
     overdue_count = len(schedules_df[(schedules_df["status"] == "Scheduled") & (schedules_df["scheduled_date"] < today_str)])
     
+    # Colored KPI Cards
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Registered Seniors", len(seniors_df))
-    c2.metric("Completed Checkups", len(checkups_df))
-    c3.metric("Upcoming Checkups", upcoming_count)
-    c4.metric("Overdue Follow-Ups", overdue_count, delta_color="inverse")
+    with c1:
+        st.markdown(f"""
+            <div class="kpi-card kpi-teal">
+                <div class="kpi-title">Registered Seniors</div>
+                <div class="kpi-value">{len(seniors_df)}</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with c2:
+        st.markdown(f"""
+            <div class="kpi-card kpi-green">
+                <div class="kpi-title">Completed Checkups</div>
+                <div class="kpi-value">{len(checkups_df)}</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with c3:
+        st.markdown(f"""
+            <div class="kpi-card kpi-amber">
+                <div class="kpi-title">Upcoming Checkups</div>
+                <div class="kpi-value">{upcoming_count}</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with c4:
+        st.markdown(f"""
+            <div class="kpi-card kpi-red">
+                <div class="kpi-title">Overdue Follow-Ups</div>
+                <div class="kpi-value">{overdue_count}</div>
+            </div>
+        """, unsafe_allow_html=True)
     
     st.divider()
     
@@ -271,8 +387,19 @@ if choice == "📊 Dashboard":
         if not checkups_df.empty:
             service_counts = checkups_df["service_name"].value_counts().reset_index()
             service_counts.columns = ["Service", "Count"]
-            fig = px.pie(service_counts, values="Count", names="Service", hole=0.4)
-            fig.update_layout(margin=dict(t=20, b=20, l=20, r=20), height=300)
+            fig = px.pie(
+                service_counts,
+                values="Count",
+                names="Service",
+                hole=0.45,
+                color_discrete_sequence=["#0F4C5C", "#008080", "#2ECC71", "#F39C12", "#3498DB"]
+            )
+            fig.update_layout(
+                margin=dict(t=20, b=20, l=20, r=20),
+                height=300,
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)"
+            )
             st.plotly_chart(fig, use_container_width=True)
         else:
             st.info("No checkup data available yet.")
@@ -343,7 +470,7 @@ elif choice == "👴 Senior Citizen Profiles":
                 
                 col_u, col_d = st.columns(2)
                 update_btn = col_u.form_submit_button("Update Profile", use_container_width=True)
-                delete_btn = col_d.form_submit_button("Delete Record", type="primary", use_container_width=True)
+                delete_btn = col_d.form_submit_button("Delete Record", use_container_width=True)
                 
                 if update_btn:
                     c = conn.cursor()
@@ -368,7 +495,7 @@ elif choice == "👴 Senior Citizen Profiles":
 # ==========================================
 elif choice == "🩺 Health Checkup Records":
     st.title("🩺 Health Checkup Records")
-    st.caption("Note: This system records vital signs and observations entered by authorized personnel. It does not diagnose diseases or prescribe medication.")
+    st.info("ℹ️ Note: This system records vital signs and observations entered by authorized personnel. It does not diagnose diseases or prescribe medication.")
     
     tab1, tab2 = st.tabs(["➕ Record New Checkup", "📜 Checkup History"])
     
@@ -455,6 +582,17 @@ elif choice == "📅 Follow-Up Monitoring":
             return "✅ Completed"
         return "❌ Missed"
 
+    def color_status_row(val):
+        if "Overdue" in str(val):
+            return "background-color: #FADBD8; color: #922B21; font-weight: bold;"
+        elif "Upcoming" in str(val):
+            return "background-color: #FCF3CF; color: #9A7D0A; font-weight: bold;"
+        elif "Completed" in str(val):
+            return "background-color: #D4EFDF; color: #1E8449; font-weight: bold;"
+        elif "Missed" in str(val):
+            return "background-color: #EBEDEF; color: #566573; font-weight: bold;"
+        return ""
+
     if not df_sched.empty:
         df_sched["Monitoring Status"] = df_sched.apply(get_display_status, axis=1)
         
@@ -464,11 +602,9 @@ elif choice == "📅 Follow-Up Monitoring":
         else:
             filtered_df = df_sched
             
-        st.dataframe(
-            filtered_df[["schedule_id", "Monitoring Status", "senior_id", "full_name", "contact_number", "service_name", "scheduled_date", "notes"]],
-            use_container_width=True,
-            hide_index=True
-        )
+        display_cols = filtered_df[["schedule_id", "Monitoring Status", "senior_id", "full_name", "contact_number", "service_name", "scheduled_date", "notes"]]
+        styled_df = display_cols.style.map(color_status_row, subset=["Monitoring Status"])
+        st.dataframe(styled_df, use_container_width=True, hide_index=True)
         
         st.subheader("Update Visit Status")
         col1, col2, col3 = st.columns([2, 2, 1])
